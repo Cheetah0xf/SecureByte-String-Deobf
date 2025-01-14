@@ -20,24 +20,9 @@ namespace SByteStringDeobf
 
         static void Main(string[] args)
         {  
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.Title = "SecureByte String Deobfuscator";
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-            Console.WriteLine(">>SecureByte String Deobfuscator By Cheetah.");
-            Console.ResetColor();
             Console.ForegroundColor = ConsoleColor.Magenta;
-            Console.WriteLine("⠀⠀⠀⠀⣠⣶⡾⠏⠉⠙⠳⢦⡀⠀⠀⠀⢠⠞⠉⠙⠲⡀⠀");
-            Console.WriteLine("⠀⠀⠀⣴⠿⠏⠀⠀⠀⠀⠀⠀⢳⡀⠀⡏⠀⠀⠀⠀⠀⢷");
-            Console.WriteLine("⠀⠀⢠⣟⣋⡀⢀⣀⣀⡀⠀⣀⡀⣧⠀⢸⠀⠀⠀⠀⠀⡇");
-            Console.WriteLine("⠀⠀⢸⣯⡭⠁⠸⣛⣟⠆⡴⣻⡲⣿⠀⣸⠀⠀OK⠀ ⡇");
-            Console.WriteLine("⠀⠀⣟⣿⡭⠀⠀⠀⠀⠀⢱⠀⠀⣿⠀⢹⠀⠀⠀⠀⠀⡇");
-            Console.WriteLine("⠀⠀⠙⢿⣯⠄⠀⠀⠀⢀⡀⠀⠀⡿⠀⠀⡇⠀⠀⠀⠀⡼");
-            Console.WriteLine("⠀⠀⠀⠀⠹⣶⠆⠀⠀⠀⠀⠀⡴⠃⠀⠀⠘⠤⣄⣠⠞⠀");
-            Console.WriteLine("⠀⠀⠀⠀⠀⢸⣷⡦⢤⡤⢤⣞⣁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀");
-            Console.WriteLine("⠀⠀⢀⣤⣴⣿⣏⠁⠀⠀⠸⣏⢯⣷⣖⣦⡀⠀⠀⠀⠀⠀⠀");
-            Console.WriteLine("⢀⣾⣽⣿⣿⣿⣿⠛⢲⣶⣾⢉⡷⣿⣿⠵⣿⠀⠀⠀⠀⠀⠀");
-            Console.WriteLine("⣼⣿⠍⠉⣿⡭⠉⠙⢺⣇⣼⡏⠀⠀⠀⣄⢸⠀⠀⠀⠀⠀⠀");
-            Console.WriteLine("⣿⣿⣧⣀⣿………⣀⣰⣏⣘⣆⣀");
+            Console.Title = "SecureByte String Deobfuscator";
+            Console.WriteLine(">>SecureByte String Deobfuscator By Cheetah.");
             Console.ResetColor();
             Console.ForegroundColor = ConsoleColor.Cyan;
 
