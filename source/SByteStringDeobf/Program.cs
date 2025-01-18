@@ -1,9 +1,10 @@
-﻿using dnlib.DotNet;
+using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using dnlib.DotNet.Writer;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 
 //SECUREBYTE STRING DEOBFUSCATOR
@@ -19,8 +20,9 @@ namespace SByteStringDeobf
         static string output;
 
         static void Main(string[] args)
-        {  
+        {
             Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.OutputEncoding = Encoding.UTF8;
             Console.Title = "SecureByte String Deobfuscator";
             Console.WriteLine(">>SecureByte String Deobfuscator By Cheetah.");
             Console.ResetColor();
@@ -44,16 +46,16 @@ namespace SByteStringDeobf
             {
                 Assembly runtimeAssembly = Assembly.LoadFile(input);
 
-                string[] encStrings = null;
+
 
                 foreach (var type in module.GetTypes())
                 {
-                    
-                    string[] cachedStringsList = null;
+
+
 
                     foreach (var method in type.Methods)
                     {
-                       
+
                         if (!method.HasBody || !method.Body.HasInstructions)
                             continue;
 
@@ -61,64 +63,50 @@ namespace SByteStringDeobf
 
                         for (int i = 0; i < instructions.Count; i++)
                         {
-                           
+
                             if (instructions[i].OpCode == OpCodes.Ldsfld &&
                                 instructions[i + 1].IsLdcI4() &&
                                 instructions[i + 2].OpCode == OpCodes.Call
                                 ) //PATTERN MATCHING
                             {
-                               
 
-                                if (encStrings == null)
+
+
+                                string operand = instructions[i].Operand.ToString();
+                                string[] parts = operand.Split(new[] { ' ', ':' }, StringSplitOptions.RemoveEmptyEntries);
+
+                                string className = parts[1];
+                                string fieldName = parts[2];
+
+
+                                Console.WriteLine($"Class: {className} and Field: {fieldName}");
+
+
+                                Module mod = runtimeAssembly.ManifestModule;
+                                FieldInfo fieldInfo;
+                                if (className == "<Module>")
                                 {
-                                    string operand = instructions[i].Operand.ToString();
-                                    string[] parts = operand.Split(new[] { ' ', ':' }, StringSplitOptions.RemoveEmptyEntries);
-
-                                    string className = parts[1];
-                                    string fieldName = parts[2];
-                                    Console.WriteLine($"Class: {className} and Field: {fieldName}");
-                                    Module mod = runtimeAssembly.ManifestModule;
-                                    FieldInfo fieldInfo;
-                                    if (className == "<Module>")
-                                    {
-                                        fieldInfo = mod.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-                                    }
-                                    else
-                                    {
-                                        Type runtimeTyp = runtimeAssembly.GetType(className);
-                                        if (runtimeTyp == null)
-                                        {
-                                            Console.WriteLine($"Error: Type '{className}' not found in the assembly.");
-                                            return;
-                                        } 
-                                        fieldInfo = runtimeTyp.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-                                    }
-                                    cachedStringsList = (string[])fieldInfo.GetValue(null);
-                                    if (cachedStringsList == null || cachedStringsList.Length == 0)
-                                    {
-                                        Console.WriteLine("Error: Retrieved stringsList is null or empty.");
-                                        continue;
-                                    }
-
-                                    encStrings = new string[cachedStringsList.Length];
-                                    for (int j = 0; j < cachedStringsList.Length; j++)
-                                    {
-                                        try
-                                        {
-                                            encStrings[j] = cachedStringsList[j];
-                                            Console.WriteLine($"Encrypted string [{j}]: {encStrings[j]}");
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Console.WriteLine($"Error processing string {j}: {ex.Message}");
-                                        }
-                                    }
+                                    fieldInfo = mod.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
                                 }
+                                else
+                                {
+                                    Type runtimeTyp = runtimeAssembly.GetType(className);
+                                    if (runtimeTyp == null)
+                                    {
+                                        Console.WriteLine($"Error: Type '{className}' not found in the assembly.");
+                                        return;
+                                    }
+                                    fieldInfo = runtimeTyp.GetField(fieldName, BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
+
+                                }
+
+                                object cachedStringsList = fieldInfo.GetValue(null);
 
                                 if (instructions[i + 2].Operand is MethodDef decryptionMethod)
                                 {
+                                    Console.ForegroundColor = ConsoleColor.Green;
                                     Console.WriteLine($"Found decryption method: {decryptionMethod.FullName}");
-
+                                    Console.ForegroundColor = ConsoleColor.Cyan;
                                     Type runtimeType = runtimeAssembly.GetType(decryptionMethod.DeclaringType.FullName);
                                     MethodInfo decryptionMethodInfo = runtimeType.GetMethod(decryptionMethod.Name, BindingFlags.Public | BindingFlags.Static);
 
@@ -126,7 +114,7 @@ namespace SByteStringDeobf
 
                                     object[] argss =
                                     {
-                                            encStrings,
+                                            cachedStringsList,
                                             instructions[i + 1].GetLdcI4Value()
 
                                     };
@@ -144,7 +132,7 @@ namespace SByteStringDeobf
                                             instructions[i].Operand = decryptedString;
                                             instructions[i + 1].OpCode = OpCodes.Nop;
                                             instructions[i + 2].OpCode = OpCodes.Nop;
-                                     
+
                                         }
 
                                     }
@@ -180,6 +168,6 @@ namespace SByteStringDeobf
 
             Console.WriteLine("Decryption Done!");
             Console.ReadKey();
-        } 
+        }
     }
 }
